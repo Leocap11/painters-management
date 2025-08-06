@@ -1,0 +1,75 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["debian-openssl-3.0.x", "darwin-arm64", "windows"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Client {
+  id                String      @id @default(uuid())
+  first_name        String
+  last_name         String
+  address           String      
+  city              String
+  fiscal_code       String?     @unique
+  vat_number        String?     @unique
+  mobile_phone      String?     @unique
+  telephone         String?     @unique
+  email             String?     @unique
+  WorkOrder         WorkOrder[]
+}
+
+model Material {
+  id                    String      @id @default(uuid())
+  product_code          String?     
+  name                  String
+  cost_per_square_meter Float
+  instructions_for_use  String?
+  supplier_id           String? 
+  vat_percentage        Int
+
+  //relations
+  Supplier              Supplier? @relation(references: [id], fields: [supplier_id])
+  WorkOrders            WorkOrder[] @relation("WorkOrderMaterials")
+
+  @@unique([product_code,supplier_id,name])
+}
+
+model WorkOrder {
+  id                 String   @id @default(uuid())
+  client_id          String
+  net_work_cost      Float
+  total_vat_cost     Float
+  final_cost         Float
+  start_work_date    DateTime
+  end_work_date      DateTime
+  is_invoice_sended  Boolean
+
+  //relations
+  Client   Client     @relation(references: [id], fields: [client_id])
+  Material Material[] @relation("WorkOrderMaterials")
+}
+
+
+model Supplier{
+  id              String @id @default(uuid())
+  name            String
+  vat_number      String @unique
+  address         String
+  city            String
+  email           String?
+  mobile_phone    String?
+  telephone       String?
+
+  //relations
+  Material Material[]
+}
