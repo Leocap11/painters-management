@@ -20,7 +20,7 @@ export const FromClientEntityToClientModel = (source: ClientEntity): Client => {
   };
 };
 
-export const FromClientEntityToClientModelWithoutWorkOrders = (
+export const FromClientEntityWithoutWorkOrdersToClientModelWithoutWorkOrders = (
   source: Omit<ClientEntity, 'WorkOrders'>
 ): Omit<Client, 'WorkOrders'> => {
   return {

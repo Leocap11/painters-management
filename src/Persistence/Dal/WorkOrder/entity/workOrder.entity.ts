@@ -4,5 +4,9 @@ import { MaterialEntity } from '../../Material/entity/material.entity';
 
 export type WorkOrderEntity = PrismaPaintersEntities.WorkOrder & {
   Client: Omit<ClientEntity, 'WorkOrders'>;
-  Materials: MaterialEntity[];
+  WorkOrderMaterials: (PrismaPaintersEntities.WorkOrderMaterial & {
+    Material: MaterialEntity;
+  })[];
 };
+
+export type WorkOrderStatus = PrismaPaintersEntities.$Enums.WorkOrderStatus;

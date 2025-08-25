@@ -1,5 +1,5 @@
 import { Client } from 'src/Domain/Client/model/client.model';
-import { Material } from 'src/Domain/Material/model/material.model';
+import { WorkOrderMaterial } from 'src/Domain/WorkOrderMaterial/model/workOrderMaterial.model';
 
 export interface WorkOrder {
   id: string;
@@ -9,8 +9,15 @@ export interface WorkOrder {
   startWorkOrderDate: Date;
   endWorkOrderDate: Date;
   isInvoiceSended: boolean;
+  status: WorkOrderStatusModel;
 
   //relations
   Client: Omit<Client, 'WorkOrders'>;
-  Materials: Material[];
+  WorkOrderMaterials: WorkOrderMaterial[];
+}
+
+export enum WorkOrderStatusModel {
+  IN_PROGRESS = 'IN_PROGRESS',
+  CLOSED = 'CLOSED',
+  CREATED = 'CREATED'
 }

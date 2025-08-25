@@ -1,4 +1,4 @@
-import { FromSupplierEntityToSupplierModel } from '../../Supplier/mapper/supplier.mapper';
+import { FromSupplierWithMaterialsEntityToSupplierModelWithoutMaterials } from '../../Supplier/mapper/supplier.mapper';
 import { MaterialEntity } from 'src/Persistence/Dal/Material/entity/material.entity';
 import { Material } from '../../../../Domain/Material/model/material.model';
 
@@ -13,6 +13,8 @@ export const FromMaterialEntityToMaterialModel = (
     instructionsForUse: source.instructions_for_use,
     vatPercentage: source.vat_percentage,
 
-    Supplier: FromSupplierEntityToSupplierModel(source.Supplier)
+    Supplier: FromSupplierWithMaterialsEntityToSupplierModelWithoutMaterials(
+      source.Supplier
+    )
   };
 };

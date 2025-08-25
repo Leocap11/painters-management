@@ -18,3 +18,18 @@ export const FromSupplierEntityToSupplierModel = (
     Materials: source.Materials.map(FromMaterialEntityToMaterialModel)
   };
 };
+
+export const FromSupplierWithMaterialsEntityToSupplierModelWithoutMaterials = (
+  source: SupplierEntity
+): Omit<Supplier, 'Materials'> => {
+  return {
+    id: source.id,
+    name: source.name,
+    vatNumber: source.vat_number,
+    address: source.address,
+    city: source.city,
+    email: source.email,
+    mobilePhone: source.mobile_phone,
+    telephone: source.telephone
+  };
+};
