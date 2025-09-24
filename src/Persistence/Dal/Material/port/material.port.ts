@@ -31,7 +31,7 @@ export interface CreateMaterialInput {
 
 export interface UpdateMaterialInput {
   id: string;
-  data?: {
+  data: {
     productCode?: string;
     name?: string;
     costPerSquareMeter?: number;

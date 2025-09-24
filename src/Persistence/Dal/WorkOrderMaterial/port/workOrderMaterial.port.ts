@@ -15,7 +15,7 @@ export interface CreateWorkOrderMaterialInput {
 
 export interface UpdateWorkOrderMaterialInput {
   id: string;
-  data?: {
+  data: {
     unitPrice?: number;
     materialId?: string;
     squareMeters?: number;

@@ -21,7 +21,7 @@ export interface CreateSupplierInput {
 
 export interface UpdateSupplierInput {
   id: string;
-  data?: {
+  data: {
     name?: string;
     vatNumber?: string;
     address?: string;

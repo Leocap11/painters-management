@@ -1,6 +1,6 @@
 export interface UpdateSupplierUseCaseCommand {
   id: string;
-  data?: {
+  data: {
     name?: string;
     vatNumber?: string;
     address?: string;
