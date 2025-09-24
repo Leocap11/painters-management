@@ -2,17 +2,21 @@ import {
   WorkOrder,
   WorkOrderStatusModel
 } from 'src/Domain/WorkOrder/model/workOrder.model';
+import { Paged } from 'src/shared/utils/utils';
 
 export interface WorkOrderPersistencePort {
-  findAll(input: FindAllWorkOrderInput): Promise<WorkOrder[]>;
+  findAll(input: FindAllWorkOrderInput): Promise<Paged<WorkOrder[]>>;
   getOne(input: { id: string }): Promise<WorkOrder>;
   create(input: CreateWorkOrderInput): Promise<WorkOrder>;
   update(input: UpdateWorkOrderInput): Promise<WorkOrder>;
-  updateStatus(input: UpdateStatusWorkOrderInput): Promise<WorkOrder>;
   delete(input: { id: string }): Promise<void>;
 }
 
 export interface FindAllWorkOrderInput {
+  pagination: {
+    pageNumber: number;
+    pageSize: number;
+  };
   filters?: {
     search?: string;
     isInvoiceSended?: boolean;
@@ -40,19 +44,13 @@ export interface CreateWorkOrderInput {
 
 export interface UpdateWorkOrderInput {
   id: string;
-  data?: {
+  data: {
     startWorkOrderDate?: Date;
     endWorkOrderDate?: Date;
     isInvoiceSended?: boolean;
     netWorkCost?: number;
     totalVatCost?: number;
     finalCost?: number;
-  };
-}
-
-export interface UpdateStatusWorkOrderInput {
-  id: string;
-  data?: {
     status?: WorkOrderStatusModel;
   };
 }

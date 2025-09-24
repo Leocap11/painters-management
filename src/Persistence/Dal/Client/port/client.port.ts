@@ -28,7 +28,7 @@ export interface CreateClientInput {
 
 export interface UpdateClientInput {
   id: string;
-  data?: {
+  data: {
     firstName?: string;
     lastName?: string;
     address?: string;

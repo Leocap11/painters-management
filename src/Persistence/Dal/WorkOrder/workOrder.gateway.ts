@@ -3,7 +3,6 @@ import { PrismaPaintersEntities } from 'src/Persistence/Clients/Prisma/PrismaPai
 import {
   CreateWorkOrderInput,
   FindAllWorkOrderInput,
-  UpdateStatusWorkOrderInput,
   UpdateWorkOrderInput,
   WorkOrderPersistencePort
 } from './port/workOrder.port';
@@ -13,19 +12,20 @@ import {
   FormWorkOrderStatusToWorkOrderStatusPrisma,
   FromWorkOrderEntityToWorkOrderModel
 } from './mapper/workOrder.mapper';
+import { Paged } from 'src/shared/utils/utils';
 
 @Injectable()
 export class WorkOrderGateway implements WorkOrderPersistencePort {
   constructor(private readonly prisma: PrismaPaintersEntities.PrismaClient) {}
 
-  private include: {
-    Client: true;
+  private include = {
+    Client: true,
     WorkOrderMaterials: {
       include: {
-        Material: true;
-      };
-    };
-  };
+        Material: true
+      }
+    }
+  } satisfies PrismaPaintersEntities.Prisma.WorkOrderInclude;
 
   async create(input: CreateWorkOrderInput): Promise<WorkOrder> {
     const workOrder = await this.prisma.workOrder.create({
@@ -58,89 +58,105 @@ export class WorkOrderGateway implements WorkOrderPersistencePort {
     return FromWorkOrderEntityToWorkOrderModel(workOrder);
   }
 
-  async findAll(input: FindAllWorkOrderInput): Promise<WorkOrder[]> {
-    const workOrders = await this.prisma.workOrder.findMany({
-      include: this.include,
-      where: {
-        AND: [
-          {
-            ...(input.filters.clientId && {
-              client_id: input.filters.clientId
-            })
-          },
-          {
-            ...(input.filters.isInvoiceSended && {
-              is_invoice_sended: input.filters.isInvoiceSended
-            })
-          },
-          {
-            ...(input.filters.materialId && {
-              WorkOrderMaterials: {
-                some: {
-                  material_id: { in: input.filters.materialId }
-                }
+  async findAll(input: FindAllWorkOrderInput): Promise<Paged<WorkOrder[]>> {
+    const where = {
+      AND: [
+        {
+          ...(input.filters.clientId && {
+            client_id: input.filters.clientId
+          })
+        },
+        {
+          ...(input.filters.isInvoiceSended && {
+            is_invoice_sended: input.filters.isInvoiceSended
+          })
+        },
+        {
+          ...(input.filters.materialId && {
+            WorkOrderMaterials: {
+              some: {
+                material_id: { in: input.filters.materialId }
               }
-            })
-          },
+            }
+          })
+        },
+        {
+          ...(input.filters.periodDateFrom && {
+            end_work_date: { gte: input.filters.periodDateFrom }
+          })
+        },
+        {
+          ...(input.filters.periodDateTo && {
+            start_work_date: { lte: input.filters.periodDateTo }
+          })
+        },
+        {
+          ...(input.filters.workOrderStatus && {
+            status: input.filters.workOrderStatus
+          })
+        },
+        {
+          ...(input.filters.city && {
+            Client: {
+              city: input.filters.workOrderStatus
+            }
+          })
+        }
+      ],
+      ...(input.filters.search && {
+        OR: [
           {
-            ...(input.filters.periodDateFrom && {
-              end_work_date: { gte: input.filters.periodDateFrom }
-            })
-          },
-          {
-            ...(input.filters.periodDateTo && {
-              start_work_date: { lte: input.filters.periodDateTo }
-            })
-          },
-          {
-            ...(input.filters.workOrderStatus && {
-              status: input.filters.workOrderStatus
-            })
-          },
-          {
-            ...(input.filters.city && {
-              Client: {
-                city: input.filters.workOrderStatus
+            Client: {
+              first_name: {
+                contains: input.filters.search,
+                mode: 'insensitive'
               }
-            })
-          }
-        ],
-        ...(input.filters.search && {
-          OR: [
-            {
-              Client: {
-                first_name: {
-                  contains: input.filters.search,
-                  mode: 'insensitive'
-                }
+            }
+          },
+          {
+            Client: {
+              last_name: {
+                contains: input.filters.search,
+                mode: 'insensitive'
               }
-            },
-            {
-              Client: {
-                last_name: {
-                  contains: input.filters.search,
-                  mode: 'insensitive'
-                }
-              }
-            },
-            {
-              WorkOrderMaterials: {
-                some: {
-                  Material: {
-                    name: {
-                      contains: input.filters.search,
-                      mode: 'insensitive'
-                    }
+            }
+          },
+          {
+            WorkOrderMaterials: {
+              some: {
+                Material: {
+                  name: {
+                    contains: input.filters.search,
+                    mode: 'insensitive'
                   }
                 }
               }
             }
-          ]
-        })
-      }
+          }
+        ]
+      })
+    } satisfies PrismaPaintersEntities.Prisma.WorkOrderWhereInput;
+
+    const totalCount = await this.prisma.workOrder.count({
+      where
     });
 
-    return workOrders.map(FromWorkOrderEntityToWorkOrderModel);
+    const workOrders = await this.prisma.workOrder.findMany({
+      include: this.include,
+      skip: (input.pagination.pageNumber - 1) * input.pagination.pageSize,
+      take: input.pagination.pageSize,
+      where
+    });
+
+    return {
+      data: workOrders.map(FromWorkOrderEntityToWorkOrderModel),
+      pagination: {
+        pageNumber: input.pagination.pageNumber,
+        pageSize: input.pagination.pageSize,
+        totalItems: totalCount,
+        totalPages: Math.ceil(totalCount / input.pagination.pageSize)
+      }
+    };
   }
 
   async getOne(input: { id: string }): Promise<WorkOrder> {
@@ -156,26 +172,13 @@ export class WorkOrderGateway implements WorkOrderPersistencePort {
       include: this.include,
       where: { id: input.id },
       data: {
+        status: FormWorkOrderStatusToWorkOrderStatusPrisma(input.data.status),
         end_work_date: input.data.endWorkOrderDate,
         start_work_date: input.data.startWorkOrderDate,
         is_invoice_sended: input.data.isInvoiceSended,
         net_work_cost: input.data.netWorkCost,
         total_vat_cost: input.data.totalVatCost,
         final_cost: input.data.finalCost
-      }
-    });
-
-    return FromWorkOrderEntityToWorkOrderModel(workOrder);
-  }
-
-  async updateStatus(input: UpdateStatusWorkOrderInput): Promise<WorkOrder> {
-    const workOrder = await this.prisma.workOrder.update({
-      include: this.include,
-      where: {
-        id: input.id
-      },
-      data: {
-        status: FormWorkOrderStatusToWorkOrderStatusPrisma(input.data.status)
       }
     });
 

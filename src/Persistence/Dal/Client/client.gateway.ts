@@ -13,7 +13,9 @@ import { FromClientEntityToClientModel } from './mapper/client.mapper';
 export class ClientGateway implements ClientPersistencePort {
   constructor(private readonly prisma: PrismaPaintersEntities.PrismaClient) {}
 
-  private readonly include = { WorkOrder: true };
+  private readonly include = {
+    WorkOrder: true
+  } satisfies PrismaPaintersEntities.Prisma.ClientInclude;
 
   async getOne(input: { id: string }): Promise<Client> {
     const client = await this.prisma.client.findUnique({
