@@ -159,12 +159,12 @@ export class WorkOrderGateway implements WorkOrderPersistencePort {
     };
   }
 
-  async getOne(input: { id: string }): Promise<WorkOrder> {
+  async getOne(input: { id: string }): Promise<WorkOrder | null> {
     const workOrder = await this.prisma.workOrder.findUnique({
       include: this.include,
       where: { id: input.id }
     });
-    return FromWorkOrderEntityToWorkOrderModel(workOrder);
+    return workOrder ? FromWorkOrderEntityToWorkOrderModel(workOrder) : null;
   }
 
   async update(input: UpdateWorkOrderInput): Promise<WorkOrder> {

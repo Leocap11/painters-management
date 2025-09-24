@@ -7,7 +7,7 @@ import { GetWorkOrderUseCaseCommand } from './GetWorkOrderUseCase.command';
 export class GetWorkOrderUseCase {
   constructor(private readonly workOrderGateway: WorkOrderGateway) {}
 
-  async run(command: GetWorkOrderUseCaseCommand): Promise<WorkOrder> {
+  async run(command: GetWorkOrderUseCaseCommand): Promise<WorkOrder | null> {
     return await this.workOrderGateway.getOne(command);
   }
 }

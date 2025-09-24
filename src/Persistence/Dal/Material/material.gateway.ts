@@ -8,62 +8,79 @@ import {
 } from './port/material.port';
 import { Material } from 'src/Domain/Material/model/material.model';
 import { FromMaterialEntityToMaterialModel } from './mapper/material.mapper';
+import { Paged } from 'src/shared/utils/utils';
 
 @Injectable()
 export class MaterialGateway implements MaterialPersistencePort {
   constructor(private readonly prisma: PrismaPaintersEntities.PrismaClient) {}
 
   private readonly include = { Supplier: true };
-  async findAll(input: FindAllMaterialInput): Promise<Material[]> {
-    const materials = await this.prisma.material.findMany({
-      include: this.include,
-      where: {
-        ...(input.filters.search && {
-          OR: [
-            {
-              name: {
-                contains: input.filters.name,
-                mode: 'insensitive'
-              }
-            },
-            {
-              product_code: {
-                contains: input.filters.productCode,
-                mode: 'insensitive'
-              }
+  async findAll(input: FindAllMaterialInput): Promise<Paged<Material[]>> {
+    const where = {
+      ...(input.filters.search && {
+        OR: [
+          {
+            name: {
+              contains: input.filters.name,
+              mode: 'insensitive'
             }
-          ]
-        }),
-        AND: [
-          {
-            ...(input.filters.name && {
-              name: input.filters.name
-            })
           },
           {
-            ...(input.filters.productCode && {
-              name: input.filters.productCode
-            })
-          },
-          {
-            ...(input.filters.supplierId && {
-              name: input.filters.supplierId
-            })
+            product_code: {
+              contains: input.filters.productCode,
+              mode: 'insensitive'
+            }
           }
         ]
-      }
+      }),
+      AND: [
+        {
+          ...(input.filters.name && {
+            name: input.filters.name
+          })
+        },
+        {
+          ...(input.filters.productCode && {
+            name: input.filters.productCode
+          })
+        },
+        {
+          ...(input.filters.supplierId && {
+            name: input.filters.supplierId
+          })
+        }
+      ]
+    } satisfies PrismaPaintersEntities.Prisma.MaterialWhereInput;
+
+    const totalCount = await this.prisma.material.count({
+      where
     });
 
-    return materials.map(FromMaterialEntityToMaterialModel);
+    const materials = await this.prisma.material.findMany({
+      include: this.include,
+      skip: (input.pagination.pageNumber - 1) * input.pagination.pageSize,
+      take: input.pagination.pageSize,
+      where
+    });
+
+    return {
+      data: materials.map(FromMaterialEntityToMaterialModel),
+      pagination: {
+        pageNumber: input.pagination.pageNumber,
+        pageSize: input.pagination.pageSize,
+        totalItems: totalCount,
+        totalPages: Math.ceil(totalCount / input.pagination.pageSize)
+      }
+    };
   }
 
-  async getOne(input: { id: string }): Promise<Material> {
+  async getOne(input: { id: string }): Promise<Material | null> {
     const material = await this.prisma.material.findUnique({
       include: this.include,
       where: { id: input.id }
     });
 
-    return FromMaterialEntityToMaterialModel(material);
+    return material ? FromMaterialEntityToMaterialModel(material) : null;
   }
 
   async create(input: CreateMaterialInput): Promise<Material> {

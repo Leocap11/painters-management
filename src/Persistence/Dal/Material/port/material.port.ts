@@ -1,13 +1,18 @@
 import { Material } from 'src/Domain/Material/model/material.model';
+import { Paged } from 'src/shared/utils/utils';
 
 export interface MaterialPersistencePort {
-  findAll(input: FindAllMaterialInput): Promise<Material[]>;
-  getOne(input: { id: string }): Promise<Material>;
+  findAll(input: FindAllMaterialInput): Promise<Paged<Material[]>>;
+  getOne(input: { id: string }): Promise<Material | null>;
   create(input: CreateMaterialInput): Promise<Material>;
   update(input: UpdateMaterialInput): Promise<Material>;
   delete(input: { id: string }): Promise<void>;
 }
 export interface FindAllMaterialInput {
+  pagination: {
+    pageNumber: number;
+    pageSize: number;
+  };
   filters?: {
     search?: string;
     name?: string;

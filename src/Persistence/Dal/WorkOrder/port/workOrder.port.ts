@@ -6,7 +6,7 @@ import { Paged } from 'src/shared/utils/utils';
 
 export interface WorkOrderPersistencePort {
   findAll(input: FindAllWorkOrderInput): Promise<Paged<WorkOrder[]>>;
-  getOne(input: { id: string }): Promise<WorkOrder>;
+  getOne(input: { id: string }): Promise<WorkOrder | null>;
   create(input: CreateWorkOrderInput): Promise<WorkOrder>;
   update(input: UpdateWorkOrderInput): Promise<WorkOrder>;
   delete(input: { id: string }): Promise<void>;

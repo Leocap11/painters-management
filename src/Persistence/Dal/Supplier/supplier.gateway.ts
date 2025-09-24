@@ -8,6 +8,7 @@ import {
 } from './port/supplier.port';
 import { Supplier } from 'src/Domain/Supplier/model/supplier.model';
 import { FromSupplierEntityToSupplierModel } from './mapper/supplier.mapper';
+import { Paged } from 'src/shared/utils/utils';
 
 @Injectable()
 export class SupplierGateway implements SupplierPersistenceGateway {
@@ -15,57 +16,74 @@ export class SupplierGateway implements SupplierPersistenceGateway {
 
   private readonly include = { Material: true };
 
-  async getOne(input: { id: string }): Promise<Supplier> {
+  async getOne(input: { id: string }): Promise<Supplier | null> {
     const supplier = await this.prisma.supplier.findUnique({
       include: this.include,
       where: { id: input.id }
     });
 
-    return FromSupplierEntityToSupplierModel(supplier);
+    return supplier ? FromSupplierEntityToSupplierModel(supplier) : null;
   }
-  async findAll(input: FindAllSupplierInput): Promise<Supplier[]> {
-    const suppliers = await this.prisma.supplier.findMany({
-      include: this.include,
-      where: {
-        ...(input.filters.search && {
-          OR: [
-            {
-              name: {
-                contains: input.filters.search,
-                mode: 'insensitive'
-              }
-            },
-            {
-              vat_number: {
-                contains: input.filters.search,
-                mode: 'insensitive'
-              }
-            },
-            {
-              address: {
-                contains: input.filters.search,
-                mode: 'insensitive'
-              }
-            }
-          ]
-        }),
-        AND: [
+  async findAll(input: FindAllSupplierInput): Promise<Paged<Supplier[]>> {
+    const where = {
+      ...(input.filters.search && {
+        OR: [
           {
-            ...(input.filters.city && {
-              city: input.filters.city
-            })
+            name: {
+              contains: input.filters.search,
+              mode: 'insensitive'
+            }
           },
           {
-            ...(input.filters.name && {
-              name: input.filters.name
-            })
+            vat_number: {
+              contains: input.filters.search,
+              mode: 'insensitive'
+            }
+          },
+          {
+            address: {
+              contains: input.filters.search,
+              mode: 'insensitive'
+            }
           }
         ]
-      }
+      }),
+      AND: [
+        {
+          ...(input.filters.city && {
+            city: input.filters.city
+          })
+        },
+        {
+          ...(input.filters.name && {
+            name: input.filters.name
+          })
+        }
+      ]
+    } satisfies PrismaPaintersEntities.Prisma.SupplierWhereInput;
+
+    const totalCount = await this.prisma.supplier.count({
+      where
     });
 
-    return suppliers.map(FromSupplierEntityToSupplierModel);
+    const suppliers = await this.prisma.supplier.findMany({
+      include: this.include,
+      skip: (input.pagination.pageNumber - 1) * input.pagination.pageSize,
+      take: input.pagination.pageSize,
+      where
+    });
+
+    return {
+      data: suppliers.map(FromSupplierEntityToSupplierModel),
+      pagination: {
+        pageNumber: input.pagination.pageNumber,
+        pageSize: input.pagination.pageSize,
+        totalItems: totalCount,
+        totalPages: Math.ceil(totalCount / input.pagination.pageSize)
+      }
+    };
   }
+
   async create(input: CreateSupplierInput): Promise<Supplier> {
     const supplier = await this.prisma.supplier.create({
       include: this.include,

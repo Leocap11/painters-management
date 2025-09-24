@@ -8,6 +8,7 @@ import {
 } from './port/client.port';
 import { Client } from 'src/Domain/Client/model/client.model';
 import { FromClientEntityToClientModel } from './mapper/client.mapper';
+import { Paged } from 'src/shared/utils/utils';
 
 @Injectable()
 export class ClientGateway implements ClientPersistencePort {
@@ -17,7 +18,7 @@ export class ClientGateway implements ClientPersistencePort {
     WorkOrder: true
   } satisfies PrismaPaintersEntities.Prisma.ClientInclude;
 
-  async getOne(input: { id: string }): Promise<Client> {
+  async getOne(input: { id: string }): Promise<Client | null> {
     const client = await this.prisma.client.findUnique({
       include: this.include,
       where: {
@@ -25,64 +26,80 @@ export class ClientGateway implements ClientPersistencePort {
       }
     });
 
-    return FromClientEntityToClientModel(client);
+    return client ? FromClientEntityToClientModel(client) : null;
   }
 
-  async findAll(input: FindAllClientInput): Promise<Client[]> {
-    const clients = await this.prisma.client.findMany({
-      include: this.include,
-      where: {
-        AND: [
+  async findAll(input: FindAllClientInput): Promise<Paged<Client[]>> {
+    const where = {
+      AND: [
+        {
+          ...(input.filters.city && {
+            city: input.filters.city
+          })
+        }
+      ],
+      ...(input.filters.search && {
+        OR: [
           {
-            ...(input.filters.city && {
-              city: input.filters.city
-            })
-          }
-        ],
-        ...(input.filters.search && {
-          OR: [
-            {
-              first_name: {
-                contains: input.filters.search,
-                mode: 'insensitive'
-              }
-            },
-            {
-              last_name: {
-                contains: input.filters.search,
-                mode: 'insensitive'
-              }
-            },
-            {
-              telephone: {
-                contains: input.filters.search,
-                mode: 'insensitive'
-              }
-            },
-            {
-              mobile_phone: {
-                contains: input.filters.search,
-                mode: 'insensitive'
-              }
-            },
-            {
-              vat_number: {
-                contains: input.filters.search,
-                mode: 'insensitive'
-              }
-            },
-            {
-              fiscal_code: {
-                contains: input.filters.search,
-                mode: 'insensitive'
-              }
+            first_name: {
+              contains: input.filters.search,
+              mode: 'insensitive'
             }
-          ]
-        })
-      }
+          },
+          {
+            last_name: {
+              contains: input.filters.search,
+              mode: 'insensitive'
+            }
+          },
+          {
+            telephone: {
+              contains: input.filters.search,
+              mode: 'insensitive'
+            }
+          },
+          {
+            mobile_phone: {
+              contains: input.filters.search,
+              mode: 'insensitive'
+            }
+          },
+          {
+            vat_number: {
+              contains: input.filters.search,
+              mode: 'insensitive'
+            }
+          },
+          {
+            fiscal_code: {
+              contains: input.filters.search,
+              mode: 'insensitive'
+            }
+          }
+        ]
+      })
+    } satisfies PrismaPaintersEntities.Prisma.ClientWhereInput;
+
+    const totalCount = await this.prisma.client.count({
+      where
     });
 
-    return clients.map(FromClientEntityToClientModel);
+    const clients = await this.prisma.client.findMany({
+      include: this.include,
+      skip: (input.pagination.pageNumber - 1) * input.pagination.pageSize,
+      take: input.pagination.pageSize,
+      where
+    });
+
+    return {
+      data: clients.map(FromClientEntityToClientModel),
+      pagination: {
+        pageNumber: input.pagination.pageNumber,
+        pageSize: input.pagination.pageSize,
+        totalItems: totalCount,
+        totalPages: Math.ceil(totalCount / input.pagination.pageSize)
+      }
+    };
   }
 
   async create(input: CreateClientInput): Promise<Client> {
