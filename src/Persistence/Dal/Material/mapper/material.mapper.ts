@@ -9,7 +9,7 @@ export const FromMaterialEntityToMaterialModel = (
     productCode: source.product_code,
     name: source.name,
     costPerSquareMeter: source.cost_per_square_meter,
-    instructionsForUse: source.instructions_for_use,
+    note: source.note,
     vatPercentage: source.vat_percentage,
     supplierId: source.supplier_id
   };

@@ -5,7 +5,6 @@ export interface UpdateMaterialUseCaseCommand {
     name?: string;
     costPerSquareMeter?: number;
     instructionForUse?: string;
-    supplierId?: string;
     vatPercentage?: number;
   };
 }

@@ -7,7 +7,7 @@ export const FromMaterialModelToMaterialResponseDTO = (
   return {
     id: source.id,
     costPerSquareMeter: source.costPerSquareMeter,
-    instructionsForUse: source.instructionsForUse,
+    note: source.note,
     name: source.name,
     productCode: source.productCode,
     vatPercentage: source.vatPercentage,

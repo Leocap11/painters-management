@@ -24,8 +24,8 @@ export interface CreateMaterialInput {
   productCode?: string;
   name: string;
   costPerSquareMeter: number;
-  instructionForUse?: string;
-  supplierId?: string;
+  note?: string;
+  supplierId: string;
   vatPercentage: number;
 }
 
@@ -35,8 +35,7 @@ export interface UpdateMaterialInput {
     productCode?: string;
     name?: string;
     costPerSquareMeter?: number;
-    instructionForUse?: string;
-    supplierId?: string;
+    note?: string;
     vatPercentage?: number;
   };
 }

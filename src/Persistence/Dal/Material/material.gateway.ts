@@ -90,7 +90,7 @@ export class MaterialGateway implements MaterialPersistencePort {
         product_code: input.productCode,
         name: input.name,
         cost_per_square_meter: input.costPerSquareMeter,
-        instructions_for_use: input.instructionForUse,
+        note: input.note,
         Supplier: {
           connect: {
             id: input.supplierId
@@ -110,7 +110,7 @@ export class MaterialGateway implements MaterialPersistencePort {
         product_code: input.data.productCode,
         name: input.data.name,
         cost_per_square_meter: input.data.costPerSquareMeter,
-        instructions_for_use: input.data.instructionForUse,
+        note: input.data.note,
         vat_percentage: input.data.vatPercentage
       }
     });

@@ -2,7 +2,7 @@ export interface CreateMaterialUseCaseCommand {
   productCode?: string;
   name: string;
   costPerSquareMeter: number;
-  instructionForUse?: string;
-  supplierId?: string;
+  note?: string;
+  supplierId: string;
   vatPercentage: number;
 }

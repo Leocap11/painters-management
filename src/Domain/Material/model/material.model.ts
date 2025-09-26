@@ -3,7 +3,7 @@ export interface Material {
   productCode?: string;
   name: string;
   costPerSquareMeter: number;
-  instructionsForUse?: string;
+  note?: string;
   vatPercentage: number;
   supplierId: string;
 }
