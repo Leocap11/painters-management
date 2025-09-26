@@ -1,4 +1,3 @@
-import { FromSupplierWithMaterialsEntityToSupplierModelWithoutMaterials } from '../../Supplier/mapper/supplier.mapper';
 import { MaterialEntity } from 'src/Persistence/Dal/Material/entity/material.entity';
 import { Material } from '../../../../Domain/Material/model/material.model';
 
@@ -12,9 +11,6 @@ export const FromMaterialEntityToMaterialModel = (
     costPerSquareMeter: source.cost_per_square_meter,
     instructionsForUse: source.instructions_for_use,
     vatPercentage: source.vat_percentage,
-
-    Supplier: FromSupplierWithMaterialsEntityToSupplierModelWithoutMaterials(
-      source.Supplier
-    )
+    supplierId: source.supplier_id
   };
 };

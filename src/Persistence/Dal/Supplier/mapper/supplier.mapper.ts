@@ -1,27 +1,9 @@
 import { Supplier } from 'src/Domain/Supplier/model/supplier.model';
 import { SupplierEntity } from '../entity/supplier.entity';
-import { FromMaterialEntityToMaterialModel } from 'src/Persistence/Dal/Material/mapper/material.mapper';
 
 export const FromSupplierEntityToSupplierModel = (
   source: SupplierEntity
 ): Supplier => {
-  return {
-    id: source.id,
-    name: source.name,
-    vatNumber: source.vat_number,
-    address: source.address,
-    city: source.city,
-    email: source.email,
-    mobilePhone: source.mobile_phone,
-    telephone: source.telephone,
-
-    Materials: source.Materials.map(FromMaterialEntityToMaterialModel)
-  };
-};
-
-export const FromSupplierWithMaterialsEntityToSupplierModelWithoutMaterials = (
-  source: SupplierEntity
-): Omit<Supplier, 'Materials'> => {
   return {
     id: source.id,
     name: source.name,

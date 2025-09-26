@@ -1,4 +1,4 @@
-export interface Supplier {
+export interface SupplierResponseDTO {
   id: string;
   name: string;
   vatNumber: string;

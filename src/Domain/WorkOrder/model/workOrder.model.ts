@@ -1,4 +1,3 @@
-import { Client } from 'src/Domain/Client/model/client.model';
 import { WorkOrderMaterial } from 'src/Domain/WorkOrderMaterial/model/workOrderMaterial.model';
 
 export interface WorkOrder {
@@ -12,7 +11,7 @@ export interface WorkOrder {
   status: WorkOrderStatusModel;
 
   //relations
-  Client: Omit<Client, 'WorkOrders'>;
+  clientId: string;
   WorkOrderMaterials: WorkOrderMaterial[];
 }
 

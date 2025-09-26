@@ -3,7 +3,6 @@ import {
   WorkOrderStatusModel
 } from 'src/Domain/WorkOrder/model/workOrder.model';
 import { WorkOrderEntity } from '../entity/workOrder.entity';
-import { FromClientEntityWithoutWorkOrdersToClientModelWithoutWorkOrders } from '../../Client/mapper/client.mapper';
 import { WorkOrderStatus } from '@prisma/client';
 import { FromWorkOrderMaterialEntityToWorkOrderMaterialModel } from '../../WorkOrderMaterial/mapper/workOrderMaterial.mapper';
 
@@ -21,9 +20,7 @@ export const FromWorkOrderEntityToWorkOrderModel = (
     status: FormWorkOrderStatusPrismaToWorkOrderStatus(source.status),
 
     //relations
-    Client: FromClientEntityWithoutWorkOrdersToClientModelWithoutWorkOrders(
-      source.Client
-    ),
+    clientId: source.client_id,
     WorkOrderMaterials: source.WorkOrderMaterials.map(
       FromWorkOrderMaterialEntityToWorkOrderMaterialModel
     )
