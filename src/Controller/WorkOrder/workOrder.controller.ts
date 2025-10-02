@@ -1,0 +1,160 @@
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  ParseIntPipe,
+  Patch,
+  Post,
+  Query
+} from '@nestjs/common';
+import { CreateWorkOrderUseCase } from 'src/Domain/WorkOrder/useCase/CreateWorkOrderUseCase/CreateWorkOrderUseCase';
+import { DeleteWorkOrderUseCase } from 'src/Domain/WorkOrder/useCase/DeleteWorkOrderUseCase/DeleteWorkOrderUseCase';
+import { FindAllWorkOrderUseCase } from 'src/Domain/WorkOrder/useCase/FindAllWorkOrderUseCase/FindAllWorkOrderUseCase';
+import { GetWorkOrderUseCase } from 'src/Domain/WorkOrder/useCase/GetWorkOrderUseCase/GetWorkOrderUseCase';
+import { UpdateWorkOrderUseCase } from 'src/Domain/WorkOrder/useCase/UpdateWorkOrderUseCase/UpdateWorkOrderUseCase';
+import { CreateWorkOrderMaterialUseCase } from 'src/Domain/WorkOrderMaterial/useCase/CreateWorkOrderMaterialUseCase/CreateWorkOrderMaterialUseCase';
+import {
+  buildPagedResponse,
+  buildSuccessResponse,
+  PagedResponseDto,
+  ResponseDTO
+} from 'src/shared/utils/utils';
+import { WorkOrderResponseDTO } from './dto/response';
+import { FindAllWorkOrderUseCaseCommand } from 'src/Domain/WorkOrder/useCase/FindAllWorkOrderUseCase/FindAllWorkOrderUseCase.command';
+import { FromWorkOrderModelToWorkOrderResponseDTO } from './mapper/mapper';
+import { WorkOrderStatusModel } from 'src/Domain/WorkOrder/model/workOrder.model';
+import { nonNull } from 'src/shared/utils/nonNull';
+import {
+  CreateWorkOrderRequestDTO,
+  UpdateWorkOrderRequestDTO
+} from './dto/request';
+import { WorkOrderMaterialResponseDTO } from '../WorkOrderMaterial/dto/response';
+import { CreateWorkOrderMaterialRequestDTO } from '../WorkOrderMaterial/dto/request';
+import { FromWorkOrderMaterialModelToWorkOrderMaterialResponseDTO } from '../WorkOrderMaterial/mapper/mapper';
+
+@Controller('work-orders')
+export class WorkOrderController {
+  constructor(
+    private readonly createWorkOrderUseCase: CreateWorkOrderUseCase,
+    private readonly updateWorkOrderUseCase: UpdateWorkOrderUseCase,
+    private readonly getWorkOrderUseCase: GetWorkOrderUseCase,
+    private readonly findAllWorkOrderUseCase: FindAllWorkOrderUseCase,
+    private readonly deleteWorkOrderUseCase: DeleteWorkOrderUseCase,
+    private readonly createWorkOrderMaterialUseCase: CreateWorkOrderMaterialUseCase
+  ) {}
+
+  @Get()
+  async getAllWorkOrders(
+    @Query('pageNumber', new ParseIntPipe({ optional: true }))
+    pageNumber?: number,
+    @Query('pageSize', new ParseIntPipe({ optional: true })) pageSize?: number,
+    @Query('city') city?: string,
+    @Query('clientId') clientId?: string,
+    @Query('materialIds') materialIds?: string[],
+    @Query('periodDateFrom') periodDateFrom?: string,
+    @Query('periodDateTo') periodDateTo?: string,
+    @Query('workOrderStatus') workOrderStatus?: WorkOrderStatusModel,
+    @Query('isInvoiceSended') isInvoiceSended?: boolean,
+    @Query('search') search?: string
+  ): Promise<PagedResponseDto<WorkOrderResponseDTO[]>> {
+    const filters: FindAllWorkOrderUseCaseCommand['filters'] = {};
+
+    if (city) filters.city = city;
+    if (clientId) filters.clientId = clientId;
+    if (isInvoiceSended) filters.isInvoiceSended = isInvoiceSended;
+    if (materialIds) filters.materialIds = materialIds;
+    if (periodDateFrom) filters.periodDateFrom = new Date(periodDateFrom);
+    if (periodDateTo) filters.periodDateTo = new Date(periodDateTo);
+    if (workOrderStatus) filters.workOrderStatus = workOrderStatus;
+    if (search) filters.search = search;
+
+    const suppliers = await this.findAllWorkOrderUseCase.run({
+      pagination: {
+        pageNumber: pageNumber ?? 1,
+        pageSize: pageSize ?? 20
+      },
+      filters
+    });
+
+    return buildPagedResponse(
+      suppliers.data.map(FromWorkOrderModelToWorkOrderResponseDTO),
+      suppliers.pagination
+    );
+  }
+
+  @Get(':id')
+  async getWorkOrder(
+    @Param('id') id: string
+  ): Promise<ResponseDTO<WorkOrderResponseDTO>> {
+    const workOrder = nonNull(await this.getWorkOrderUseCase.run({ id: id }));
+
+    return buildSuccessResponse(
+      FromWorkOrderModelToWorkOrderResponseDTO(workOrder)
+    );
+  }
+
+  @Post()
+  async createWorkOrder(
+    @Body() body: CreateWorkOrderRequestDTO
+  ): Promise<ResponseDTO<WorkOrderResponseDTO>> {
+    const supplier = await this.createWorkOrderUseCase.run({
+      ...body,
+      startWorkOrderDate: new Date(body.startWorkOrderDate),
+      endWorkOrderDate: new Date(body.endWorkOrderDate)
+    });
+
+    return buildSuccessResponse(
+      FromWorkOrderModelToWorkOrderResponseDTO(supplier)
+    );
+  }
+
+  @Patch(':id')
+  async updateWorkOrder(
+    @Param('id') id: string,
+    @Body() body: UpdateWorkOrderRequestDTO
+  ): Promise<ResponseDTO<WorkOrderResponseDTO>> {
+    const supplier = await this.updateWorkOrderUseCase.run({
+      id: id,
+      data: {
+        ...body,
+        endWorkOrderDate: body.endWorkOrderDate
+          ? new Date(body.endWorkOrderDate)
+          : undefined,
+        startWorkOrderDate: body.startWorkOrderDate
+          ? new Date(body.startWorkOrderDate)
+          : undefined
+      }
+    });
+
+    return buildSuccessResponse(
+      FromWorkOrderModelToWorkOrderResponseDTO(supplier)
+    );
+  }
+
+  @Delete(':id')
+  async deleteWorkOrder(@Param('id') id: string): Promise<void> {
+    await this.deleteWorkOrderUseCase.run({ id: id });
+  }
+
+  /*
+  private readonly updateWorkOrderMaterialUseCase: UpdateWorkOrderMaterialUseCase,
+  private readonly deleteWorkOrderMaterialUseCase: DeleteWorkOrderMaterialUseCase
+  */
+
+  @Post(':work-order-id/material')
+  async addMaterial(
+    @Param('work-order-id') workOrderId: string,
+    @Body() body: CreateWorkOrderMaterialRequestDTO
+  ): Promise<ResponseDTO<WorkOrderMaterialResponseDTO>> {
+    const material = await this.createWorkOrderMaterialUseCase.run({
+      ...body,
+      workOrderId: workOrderId
+    });
+
+    return buildSuccessResponse(
+      FromWorkOrderMaterialModelToWorkOrderMaterialResponseDTO(material)
+    );
+  }
+}

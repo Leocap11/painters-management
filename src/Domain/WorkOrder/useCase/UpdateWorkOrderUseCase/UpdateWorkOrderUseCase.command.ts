@@ -8,7 +8,6 @@ export interface UpdateWorkOrderUseCaseCommand {
     isInvoiceSended?: boolean;
     netWorkCost?: number;
     totalVatCost?: number;
-    finalCost?: number;
     status?: WorkOrderStatusModel;
   };
 }

@@ -39,7 +39,7 @@ export class WorkOrderGateway implements WorkOrderPersistencePort {
         status: WorkOrderStatus.CREATED,
         Client: {
           connect: {
-            id: input.client_id
+            id: input.clientId
           }
         },
 
@@ -47,7 +47,7 @@ export class WorkOrderGateway implements WorkOrderPersistencePort {
           createMany: {
             data: input.workOrderMaterials.map((wm) => ({
               unitPrice: wm.unitPrice,
-              material_id: wm.material_id,
+              material_id: wm.materialId,
               square_meters: wm.squareMeters
             }))
           }
@@ -72,10 +72,10 @@ export class WorkOrderGateway implements WorkOrderPersistencePort {
           })
         },
         {
-          ...(input.filters.materialId && {
+          ...(input.filters.materialIds && {
             WorkOrderMaterials: {
               some: {
-                material_id: { in: input.filters.materialId }
+                material_id: { in: input.filters.materialIds }
               }
             }
           })
@@ -175,10 +175,10 @@ export class WorkOrderGateway implements WorkOrderPersistencePort {
         status: FormWorkOrderStatusToWorkOrderStatusPrisma(input.data.status),
         end_work_date: input.data.endWorkOrderDate,
         start_work_date: input.data.startWorkOrderDate,
-        is_invoice_sended: input.data.isInvoiceSended,
         net_work_cost: input.data.netWorkCost,
         total_vat_cost: input.data.totalVatCost,
-        final_cost: input.data.finalCost
+        final_cost: input.data.netWorkCost + input.data.totalVatCost,
+        is_invoice_sended: input.data.isInvoiceSended
       }
     });
 

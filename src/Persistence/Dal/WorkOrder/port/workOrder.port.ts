@@ -22,7 +22,7 @@ export interface FindAllWorkOrderInput {
     isInvoiceSended?: boolean;
     city?: string;
     clientId?: string;
-    materialId?: string[];
+    materialIds?: string[];
     periodDateFrom?: Date;
     periodDateTo?: Date;
     workOrderStatus?: WorkOrderStatusModel;
@@ -30,13 +30,13 @@ export interface FindAllWorkOrderInput {
 }
 
 export interface CreateWorkOrderInput {
-  client_id: string;
+  clientId: string;
   startWorkOrderDate: Date;
   endWorkOrderDate: Date;
   netWorkCost: number;
   totalVatCost: number;
   workOrderMaterials: {
-    material_id: string;
+    materialId: string;
     squareMeters: number;
     unitPrice: number;
   }[];
@@ -50,7 +50,6 @@ export interface UpdateWorkOrderInput {
     isInvoiceSended?: boolean;
     netWorkCost?: number;
     totalVatCost?: number;
-    finalCost?: number;
     status?: WorkOrderStatusModel;
   };
 }

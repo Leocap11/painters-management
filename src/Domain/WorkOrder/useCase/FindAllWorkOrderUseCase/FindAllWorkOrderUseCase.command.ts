@@ -10,7 +10,7 @@ export interface FindAllWorkOrderUseCaseCommand {
     isInvoiceSended?: boolean;
     city?: string;
     clientId?: string;
-    materialId?: string[];
+    materialIds?: string[];
     periodDateFrom?: Date;
     periodDateTo?: Date;
     workOrderStatus?: WorkOrderStatusModel;

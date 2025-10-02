@@ -7,6 +7,7 @@ export const FromWorkOrderMaterialModelToWorkOrderMaterialResponseDTO = (
 ): WorkOrderMaterialResponseDTO => {
   return {
     id: source.id,
+    workOrderId: source.workOrderId,
     squareMeters: source.squareMeters,
     unitPrice: source.unitPrice,
     Material: FromMaterialModelToMaterialResponseDTO(source.Material)

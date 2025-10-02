@@ -1,11 +1,9 @@
 export interface CreateWorkOrderUseCaseCommand {
-  client_id: string;
+  clientId: string;
   startWorkOrderDate: Date;
   endWorkOrderDate: Date;
-  netWorkCost: number;
-  totalVatCost: number;
   workOrderMaterials: {
-    material_id: string;
+    materialId: string;
     squareMeters: number;
     unitPrice: number;
   }[];

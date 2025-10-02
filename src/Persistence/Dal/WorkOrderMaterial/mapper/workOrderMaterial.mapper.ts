@@ -7,6 +7,7 @@ export const FromWorkOrderMaterialEntityToWorkOrderMaterialModel = (
 ): WorkOrderMaterial => {
   return {
     id: source.id,
+    workOrderId: source.workOrder_id,
     unitPrice: source.unitPrice,
     squareMeters: source.square_meters,
     Material: FromMaterialEntityToMaterialModel(source.Material)

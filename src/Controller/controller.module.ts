@@ -1,7 +1,18 @@
 import { Module } from '@nestjs/common';
 import { DomainModule } from 'src/Domain/domain.module';
+import { ClientController } from './Client/client.controller';
+import { SupplierController } from './Supplier/supplier.controller';
+import { WorkOrderController } from './WorkOrder/workOrder.controller';
+import { WorkOrderMaterialController } from './WorkOrderMaterial/workOrderMaterial.controller';
+import { MaterialController } from './Material/material.controller';
 
-const controllers = [];
+const controllers = [
+  ClientController,
+  SupplierController,
+  WorkOrderController,
+  WorkOrderMaterialController,
+  MaterialController
+];
 
 @Module({
   imports: [DomainModule],
