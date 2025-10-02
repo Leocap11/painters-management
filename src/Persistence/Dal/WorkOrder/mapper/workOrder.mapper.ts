@@ -5,6 +5,8 @@ import {
 import { WorkOrderEntity } from '../entity/workOrder.entity';
 import { WorkOrderStatus } from '@prisma/client';
 import { FromWorkOrderMaterialEntityToWorkOrderMaterialModel } from '../../WorkOrderMaterial/mapper/workOrderMaterial.mapper';
+import { BadRequestException } from '@nestjs/common';
+import { ErrorCodes } from 'src/shared/errors/errorCodes';
 
 export const FromWorkOrderEntityToWorkOrderModel = (
   source: WorkOrderEntity
@@ -37,6 +39,10 @@ export const FormWorkOrderStatusPrismaToWorkOrderStatus = (
       return WorkOrderStatusModel.IN_PROGRESS;
     case 'CREATED':
       return WorkOrderStatusModel.CREATED;
+    default:
+      throw new BadRequestException(`${source} not valid`, {
+        cause: { errorCode: ErrorCodes._ERR_NOT_VALID_DATA }
+      });
   }
 };
 
@@ -50,5 +56,9 @@ export const FormWorkOrderStatusToWorkOrderStatusPrisma = (
       return WorkOrderStatus.IN_PROGRESS;
     case WorkOrderStatusModel.CREATED:
       return WorkOrderStatus.CREATED;
+    default:
+      throw new BadRequestException(`${source} not valid`, {
+        cause: { errorCode: ErrorCodes._ERR_NOT_VALID_DATA }
+      });
   }
 };
