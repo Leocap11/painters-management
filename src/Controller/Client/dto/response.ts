@@ -6,9 +6,9 @@ export interface ClientResponseDTO {
   city: string;
 
   //optional fields
-  fiscalCode?: string;
-  vatNumber?: string;
-  mobilePhone?: string;
-  telephone?: string;
-  email?: string;
+  fiscalCode: string | null;
+  vatNumber: string | null;
+  mobilePhone: string | null;
+  telephone: string | null;
+  email: string | null;
 }

@@ -4,7 +4,7 @@ export interface SupplierResponseDTO {
   vatNumber: string;
   address: string;
   city: string;
-  email?: string;
-  mobilePhone?: string;
-  telephone?: string;
+  email: string | null;
+  mobilePhone: string | null;
+  telephone: string | null;
 }
