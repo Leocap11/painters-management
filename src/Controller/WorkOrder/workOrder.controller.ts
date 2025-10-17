@@ -70,7 +70,7 @@ export class WorkOrderController {
     if (workOrderStatus) filters.workOrderStatus = workOrderStatus;
     if (search) filters.search = search;
 
-    const suppliers = await this.findAllWorkOrderUseCase.run({
+    const workOrders = await this.findAllWorkOrderUseCase.run({
       pagination: {
         pageNumber: pageNumber ?? 1,
         pageSize: pageSize ?? 20
@@ -79,8 +79,8 @@ export class WorkOrderController {
     });
 
     return buildPagedResponse(
-      suppliers.data.map(FromWorkOrderModelToWorkOrderResponseDTO),
-      suppliers.pagination
+      workOrders.data.map(FromWorkOrderModelToWorkOrderResponseDTO),
+      workOrders.pagination
     );
   }
 
@@ -99,14 +99,14 @@ export class WorkOrderController {
   async createWorkOrder(
     @Body() body: CreateWorkOrderRequestDTO
   ): Promise<ResponseDTO<WorkOrderResponseDTO>> {
-    const supplier = await this.createWorkOrderUseCase.run({
+    const workOrder = await this.createWorkOrderUseCase.run({
       ...body,
       startWorkOrderDate: new Date(body.startWorkOrderDate),
       endWorkOrderDate: new Date(body.endWorkOrderDate)
     });
 
     return buildSuccessResponse(
-      FromWorkOrderModelToWorkOrderResponseDTO(supplier)
+      FromWorkOrderModelToWorkOrderResponseDTO(workOrder)
     );
   }
 
@@ -115,7 +115,7 @@ export class WorkOrderController {
     @Param('id') id: string,
     @Body() body: UpdateWorkOrderRequestDTO
   ): Promise<ResponseDTO<WorkOrderResponseDTO>> {
-    const supplier = await this.updateWorkOrderUseCase.run({
+    const workOrder = await this.updateWorkOrderUseCase.run({
       id: id,
       data: {
         ...body,
@@ -129,7 +129,7 @@ export class WorkOrderController {
     });
 
     return buildSuccessResponse(
-      FromWorkOrderModelToWorkOrderResponseDTO(supplier)
+      FromWorkOrderModelToWorkOrderResponseDTO(workOrder)
     );
   }
 
@@ -148,13 +148,15 @@ export class WorkOrderController {
     @Param('work-order-id') workOrderId: string,
     @Body() body: CreateWorkOrderMaterialRequestDTO
   ): Promise<ResponseDTO<WorkOrderMaterialResponseDTO>> {
-    const material = await this.createWorkOrderMaterialUseCase.run({
+    const workOrderMaterial = await this.createWorkOrderMaterialUseCase.run({
       ...body,
       workOrderId: workOrderId
     });
 
     return buildSuccessResponse(
-      FromWorkOrderMaterialModelToWorkOrderMaterialResponseDTO(material)
+      FromWorkOrderMaterialModelToWorkOrderMaterialResponseDTO(
+        workOrderMaterial
+      )
     );
   }
 }
