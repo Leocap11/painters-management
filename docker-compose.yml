@@ -1,7 +1,8 @@
 services:
   painters-management.db:
-    image: postgres
+    image: postgres:16
     restart: always
+    annotations: ["front-end","development"]
     environment:
       POSTGRES_USER: user
       POSTGRES_PASSWORD: user
@@ -10,12 +11,30 @@ services:
       - 5432:5432
     volumes:
       - db:/var/lib/postgresql/data
+    
 
   adminer:
     image: adminer
     restart: always
+    annotations: ["front-end","development"]
     ports:
       - 8080:8080
+
+
+  backend: 
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    annotations: ["front-end"]
+    depends_on:
+      - painters-management.db
+    ports:
+      - 4000:3000
+    environment:
+      DATABASE_URL: postgresql://user:user@painters-management.db:5432/painters-management
+    
+
 volumes:
   db:
     name: painters-management.db
