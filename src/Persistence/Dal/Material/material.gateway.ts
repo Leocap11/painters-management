@@ -9,10 +9,11 @@ import {
 import { Material } from 'src/Domain/Material/model/material.model';
 import { FromMaterialEntityToMaterialModel } from './mapper/material.mapper';
 import { Paged } from 'src/shared/utils/utils';
+import { PaintersManagementService } from 'src/Persistence/Clients/Prisma/PrismaPaintersManagementClient';
 
 @Injectable()
 export class MaterialGateway implements MaterialPersistencePort {
-  constructor(private readonly prisma: PrismaPaintersEntities.PrismaClient) {}
+  constructor(private readonly prisma: PaintersManagementService) { }
 
   private readonly include = { Supplier: true };
   async findAll(input: FindAllMaterialInput): Promise<Paged<Material[]>> {

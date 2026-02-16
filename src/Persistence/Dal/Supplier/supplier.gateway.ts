@@ -9,10 +9,11 @@ import {
 import { Supplier } from 'src/Domain/Supplier/model/supplier.model';
 import { FromSupplierEntityToSupplierModel } from './mapper/supplier.mapper';
 import { Paged } from 'src/shared/utils/utils';
+import { PaintersManagementService } from 'src/Persistence/Clients/Prisma/PrismaPaintersManagementClient';
 
 @Injectable()
 export class SupplierGateway implements SupplierPersistenceGateway {
-  constructor(private readonly prisma: PrismaPaintersEntities.PrismaClient) {}
+  constructor(private readonly prisma: PaintersManagementService) { }
 
   private readonly include = { Material: true };
 

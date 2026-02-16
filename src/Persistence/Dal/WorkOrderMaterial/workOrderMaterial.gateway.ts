@@ -7,13 +7,13 @@ import {
 } from './port/workOrderMaterial.port';
 import { WorkOrderMaterial } from 'src/Domain/WorkOrderMaterial/model/workOrderMaterial.model';
 import { FromWorkOrderMaterialEntityToWorkOrderMaterialModel } from './mapper/workOrderMaterial.mapper';
+import { PaintersManagementService } from 'src/Persistence/Clients/Prisma/PrismaPaintersManagementClient';
 
 @Injectable()
 export class WorkOrderMaterialGateway
-  implements WorkOrderMaterialPersistencePort
-{
-  constructor(private readonly prisma: PrismaPaintersEntities.PrismaClient) {}
-  private readonly include = { Material: true, WorkOrder: true };
+  implements WorkOrderMaterialPersistencePort {
+  constructor(private readonly prisma: PaintersManagementService) { }
+  private readonly include = { Material: true, WorkOrder: true } satisfies PrismaPaintersEntities.Prisma.WorkOrderMaterialInclude;
 
   async create(
     input: CreateWorkOrderMaterialInput

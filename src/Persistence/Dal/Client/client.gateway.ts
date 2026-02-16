@@ -9,10 +9,11 @@ import {
 import { Client } from 'src/Domain/Client/model/client.model';
 import { FromClientEntityToClientModel } from './mapper/client.mapper';
 import { Paged } from 'src/shared/utils/utils';
+import { PaintersManagementService } from 'src/Persistence/Clients/Prisma/PrismaPaintersManagementClient';
 
 @Injectable()
 export class ClientGateway implements ClientPersistencePort {
-  constructor(private readonly prisma: PrismaPaintersEntities.PrismaClient) {}
+  constructor(private readonly prisma: PaintersManagementService) { }
 
   private readonly include = {
     WorkOrder: true

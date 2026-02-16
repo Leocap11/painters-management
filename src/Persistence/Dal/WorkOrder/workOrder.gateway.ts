@@ -13,10 +13,11 @@ import {
   FromWorkOrderEntityToWorkOrderModel
 } from './mapper/workOrder.mapper';
 import { Paged } from 'src/shared/utils/utils';
+import { PaintersManagementService } from 'src/Persistence/Clients/Prisma/PrismaPaintersManagementClient';
 
 @Injectable()
 export class WorkOrderGateway implements WorkOrderPersistencePort {
-  constructor(private readonly prisma: PrismaPaintersEntities.PrismaClient) {}
+  constructor(private readonly prisma: PaintersManagementService) { }
 
   private include = {
     Client: true,
