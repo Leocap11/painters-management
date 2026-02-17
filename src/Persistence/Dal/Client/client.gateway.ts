@@ -19,6 +19,10 @@ export class ClientGateway implements ClientPersistencePort {
     WorkOrder: true
   } satisfies PrismaPaintersEntities.Prisma.ClientInclude;
 
+  async getCount(): Promise<number> {
+    return await this.prisma.client.count()
+  }
+
   async getOne(input: { id: string }): Promise<Client | null> {
     const client = await this.prisma.client.findUnique({
       include: this.include,

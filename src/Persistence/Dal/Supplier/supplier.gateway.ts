@@ -17,6 +17,10 @@ export class SupplierGateway implements SupplierPersistenceGateway {
 
   private readonly include = { Material: true };
 
+  async getCount(): Promise<number> {
+    return await this.prisma.supplier.count()
+  }
+
   async getOne(input: { id: string }): Promise<Supplier | null> {
     const supplier = await this.prisma.supplier.findUnique({
       include: this.include,

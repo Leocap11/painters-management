@@ -16,6 +16,13 @@ export class MaterialGateway implements MaterialPersistencePort {
   constructor(private readonly prisma: PaintersManagementService) { }
 
   private readonly include = { Supplier: true };
+
+
+  async getCount(): Promise<number> {
+    return await this.prisma.material.count()
+  }
+
+
   async findAll(input: FindAllMaterialInput): Promise<Paged<Material[]>> {
     const where = {
       ...(input.filters.search && {

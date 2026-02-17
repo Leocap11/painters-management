@@ -28,6 +28,11 @@ export class WorkOrderGateway implements WorkOrderPersistencePort {
     }
   } satisfies PrismaPaintersEntities.Prisma.WorkOrderInclude;
 
+
+  async getCount(): Promise<number> {
+    return await this.prisma.workOrder.count()
+  }
+
   async create(input: CreateWorkOrderInput): Promise<WorkOrder> {
     const workOrder = await this.prisma.workOrder.create({
       include: this.include,

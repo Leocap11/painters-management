@@ -23,6 +23,11 @@ import { DeleteWorkOrderUseCase } from './WorkOrder/useCase/DeleteWorkOrderUseCa
 import { FindAllWorkOrderUseCase } from './WorkOrder/useCase/FindAllWorkOrderUseCase/FindAllWorkOrderUseCase';
 import { GetWorkOrderUseCase } from './WorkOrder/useCase/GetWorkOrderUseCase/GetWorkOrderUseCase';
 import { UpdateWorkOrderUseCase } from './WorkOrder/useCase/UpdateWorkOrderUseCase/UpdateWorkOrderUseCase';
+import { GetCountClientUseCase } from './Client/useCase/GetCountClientUseCase/GetCountClientUseCase';
+import { GetCountMaterialUseCase } from './Material/useCase/GetCountMaterialUseCase/GetCountMaterialUseCase';
+import { GetCountSupplierUseCase } from './Supplier/useCase/GetCountSupplierUseCase/GetCountSupplierUseCase';
+import { GetCountWorkOrderUseCase } from './WorkOrder/useCase/GetCountWorkOrderUseCase/GetCountWorkOrderUseCase';
+import { GetAllDashboardCountsUseCase } from './Dashboard/useCase/GetAllDashboardCountsUseCase/GetAllDashboardCountsUseCase';
 
 const providers = [
   //Client
@@ -31,28 +36,39 @@ const providers = [
   FindAllClientUseCase,
   GetClientUseCase,
   UpdateClientUseCase,
+  GetCountClientUseCase,
+
   //Material
   CreateMaterialUseCase,
   DeleteMaterialUseCase,
   FindAllMaterialUseCase,
   GetMaterialUseCase,
   UpdateMaterialUseCase,
+  GetCountMaterialUseCase,
+
   //Supplier
   CreateSupplierUseCase,
   DeleteSupplierUseCase,
   FindAllSupplierUseCase,
   GetSupplierUseCase,
   UpdateSupplierUseCase,
+  GetCountSupplierUseCase,
+
   //WorkOrder
   CreateWorkOrderUseCase,
   DeleteWorkOrderUseCase,
   FindAllWorkOrderUseCase,
   GetWorkOrderUseCase,
   UpdateWorkOrderUseCase,
+  GetCountWorkOrderUseCase,
+
   //WorkOrderMaterial
   CreateWorkOrderMaterialUseCase,
   DeleteWorkOrderMaterialUseCase,
-  UpdateWorkOrderMaterialUseCase
+  UpdateWorkOrderMaterialUseCase,
+
+  //Dashboard
+  GetAllDashboardCountsUseCase
 ];
 
 @Module({
@@ -60,4 +76,4 @@ const providers = [
   providers: [...providers],
   exports: [...providers]
 })
-export class DomainModule {}
+export class DomainModule { }
