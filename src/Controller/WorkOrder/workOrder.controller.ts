@@ -33,6 +33,7 @@ import {
 import { WorkOrderMaterialResponseDTO } from '../WorkOrderMaterial/dto/response';
 import { CreateWorkOrderMaterialRequestDTO } from '../WorkOrderMaterial/dto/request';
 import { FromWorkOrderMaterialModelToWorkOrderMaterialResponseDTO } from '../WorkOrderMaterial/mapper/mapper';
+import { Temporal } from '@js-temporal/polyfill';
 
 @Controller('work-orders')
 export class WorkOrderController {
@@ -43,7 +44,7 @@ export class WorkOrderController {
     private readonly findAllWorkOrderUseCase: FindAllWorkOrderUseCase,
     private readonly deleteWorkOrderUseCase: DeleteWorkOrderUseCase,
     private readonly createWorkOrderMaterialUseCase: CreateWorkOrderMaterialUseCase
-  ) {}
+  ) { }
 
   @Get()
   async getAllWorkOrders(
@@ -57,6 +58,7 @@ export class WorkOrderController {
     @Query('periodDateTo') periodDateTo?: string,
     @Query('workOrderStatus') workOrderStatus?: WorkOrderStatusModel,
     @Query('isInvoiceSended') isInvoiceSended?: boolean,
+    @Query('currentDate') currentDate?: string,
     @Query('search') search?: string
   ): Promise<PagedResponseDto<WorkOrderResponseDTO[]>> {
     const filters: FindAllWorkOrderUseCaseCommand['filters'] = {};
@@ -65,9 +67,10 @@ export class WorkOrderController {
     if (clientId) filters.clientId = clientId;
     if (isInvoiceSended) filters.isInvoiceSended = isInvoiceSended;
     if (materialIds) filters.materialIds = materialIds;
-    if (periodDateFrom) filters.periodDateFrom = new Date(periodDateFrom);
-    if (periodDateTo) filters.periodDateTo = new Date(periodDateTo);
+    if (periodDateFrom) filters.periodDateFrom = Temporal.PlainDate.from(periodDateFrom);
+    if (periodDateTo) filters.periodDateTo = Temporal.PlainDate.from(periodDateTo);
     if (workOrderStatus) filters.workOrderStatus = workOrderStatus;
+    if (currentDate) filters.currentDate = Temporal.PlainDate.from(currentDate)
     if (search) filters.search = search;
 
     const workOrders = await this.findAllWorkOrderUseCase.run({
@@ -101,8 +104,8 @@ export class WorkOrderController {
   ): Promise<ResponseDTO<WorkOrderResponseDTO>> {
     const workOrder = await this.createWorkOrderUseCase.run({
       ...body,
-      startWorkOrderDate: new Date(body.startWorkOrderDate),
-      endWorkOrderDate: new Date(body.endWorkOrderDate)
+      startWorkOrderDate: Temporal.PlainDate.from(body.startWorkOrderDate),
+      endWorkOrderDate: Temporal.PlainDate.from(body.endWorkOrderDate)
     });
 
     return buildSuccessResponse(
@@ -120,10 +123,10 @@ export class WorkOrderController {
       data: {
         ...body,
         endWorkOrderDate: body.endWorkOrderDate
-          ? new Date(body.endWorkOrderDate)
+          ? Temporal.PlainDate.from(body.endWorkOrderDate)
           : undefined,
         startWorkOrderDate: body.startWorkOrderDate
-          ? new Date(body.startWorkOrderDate)
+          ? Temporal.PlainDate.from(body.startWorkOrderDate)
           : undefined
       }
     });

@@ -1,3 +1,4 @@
+import { Temporal } from '@js-temporal/polyfill';
 import {
   WorkOrder,
   WorkOrderStatusModel
@@ -23,16 +24,18 @@ export interface FindAllWorkOrderInput {
     city?: string;
     clientId?: string;
     materialIds?: string[];
-    periodDateFrom?: Date;
-    periodDateTo?: Date;
+    periodDateFrom?: Temporal.PlainDate;
+    periodDateTo?: Temporal.PlainDate;
+    currentDate?: Temporal.PlainDate;
     workOrderStatus?: WorkOrderStatusModel;
   };
 }
 
+
 export interface CreateWorkOrderInput {
   clientId: string;
-  startWorkOrderDate: Date;
-  endWorkOrderDate: Date;
+  startWorkOrderDate: Temporal.PlainDate;
+  endWorkOrderDate: Temporal.PlainDate;
   netWorkCost: number;
   totalVatCost: number;
   workOrderMaterials: {
@@ -45,8 +48,8 @@ export interface CreateWorkOrderInput {
 export interface UpdateWorkOrderInput {
   id: string;
   data: {
-    startWorkOrderDate?: Date;
-    endWorkOrderDate?: Date;
+    startWorkOrderDate?: Temporal.PlainDate;
+    endWorkOrderDate?: Temporal.PlainDate;
     isInvoiceSended?: boolean;
     netWorkCost?: number;
     totalVatCost?: number;

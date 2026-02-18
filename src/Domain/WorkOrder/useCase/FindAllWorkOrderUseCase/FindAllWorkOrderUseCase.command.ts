@@ -1,3 +1,4 @@
+import { Temporal } from '@js-temporal/polyfill';
 import { WorkOrderStatusModel } from '../../model/workOrder.model';
 
 export interface FindAllWorkOrderUseCaseCommand {
@@ -11,8 +12,9 @@ export interface FindAllWorkOrderUseCaseCommand {
     city?: string;
     clientId?: string;
     materialIds?: string[];
-    periodDateFrom?: Date;
-    periodDateTo?: Date;
+    periodDateFrom?: Temporal.PlainDate;
+    periodDateTo?: Temporal.PlainDate;
+    currentDate?: Temporal.PlainDate;
     workOrderStatus?: WorkOrderStatusModel;
   };
 }

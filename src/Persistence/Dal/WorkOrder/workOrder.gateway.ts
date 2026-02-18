@@ -14,6 +14,7 @@ import {
 } from './mapper/workOrder.mapper';
 import { Paged } from 'src/shared/utils/utils';
 import { PaintersManagementService } from 'src/Persistence/Clients/Prisma/PrismaPaintersManagementClient';
+import { plainDateToDate } from 'src/shared/utils/temporal';
 
 @Injectable()
 export class WorkOrderGateway implements WorkOrderPersistencePort {
@@ -37,8 +38,8 @@ export class WorkOrderGateway implements WorkOrderPersistencePort {
     const workOrder = await this.prisma.workOrder.create({
       include: this.include,
       data: {
-        start_work_date: input.startWorkOrderDate,
-        end_work_date: input.endWorkOrderDate,
+        start_work_date: plainDateToDate(input.startWorkOrderDate),
+        end_work_date: plainDateToDate(input.endWorkOrderDate),
         net_work_cost: input.netWorkCost,
         total_vat_cost: input.totalVatCost,
         final_cost: input.netWorkCost + input.totalVatCost,
@@ -88,12 +89,12 @@ export class WorkOrderGateway implements WorkOrderPersistencePort {
         },
         {
           ...(input.filters.periodDateFrom && {
-            end_work_date: { gte: input.filters.periodDateFrom }
+            end_work_date: { gte: plainDateToDate(input.filters.periodDateFrom) }
           })
         },
         {
           ...(input.filters.periodDateTo && {
-            start_work_date: { lte: input.filters.periodDateTo }
+            start_work_date: { lte: plainDateToDate(input.filters.periodDateTo) }
           })
         },
         {
@@ -104,10 +105,25 @@ export class WorkOrderGateway implements WorkOrderPersistencePort {
         {
           ...(input.filters.city && {
             Client: {
-              city: input.filters.workOrderStatus
+              city: input.filters.city
             }
           })
-        }
+        },
+        {
+          ...(input.filters.currentDate && {
+            ...((): { end_work_date: { gte: Date, lte: Date } } => {
+              const startOfDay = input.filters.currentDate;
+              const endOfDay = new Date(`${startOfDay.add({ days: 7 }).toString()}T23:59:59.999Z`);
+              return {
+                end_work_date: {
+                  gte: plainDateToDate(startOfDay),
+                  lte: endOfDay
+                }
+              }
+            })
+
+          })
+        },
       ],
       ...(input.filters.search && {
         OR: [
@@ -179,8 +195,8 @@ export class WorkOrderGateway implements WorkOrderPersistencePort {
       where: { id: input.id },
       data: {
         status: FormWorkOrderStatusToWorkOrderStatusPrisma(input.data.status),
-        end_work_date: input.data.endWorkOrderDate,
-        start_work_date: input.data.startWorkOrderDate,
+        end_work_date: plainDateToDate(input.data.endWorkOrderDate),
+        start_work_date: plainDateToDate(input.data.startWorkOrderDate),
         net_work_cost: input.data.netWorkCost,
         total_vat_cost: input.data.totalVatCost,
         final_cost: input.data.netWorkCost + input.data.totalVatCost,
