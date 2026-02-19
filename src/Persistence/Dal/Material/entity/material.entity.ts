@@ -1,3 +1,5 @@
 import { PrismaPaintersEntities } from 'src/Persistence/Clients/Prisma/PrismaPaintersManagementTypes';
 
-export type MaterialEntity = PrismaPaintersEntities.Material;
+export type MaterialEntity = PrismaPaintersEntities.Material & {
+  Supplier: PrismaPaintersEntities.Supplier;
+};

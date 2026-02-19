@@ -13,15 +13,13 @@ import { PaintersManagementService } from 'src/Persistence/Clients/Prisma/Prisma
 
 @Injectable()
 export class MaterialGateway implements MaterialPersistencePort {
-  constructor(private readonly prisma: PaintersManagementService) { }
+  constructor(private readonly prisma: PaintersManagementService) {}
 
-  private readonly include = { Supplier: true };
-
+  public static readonly toInclude = { Supplier: true };
 
   async getCount(): Promise<number> {
-    return await this.prisma.material.count()
+    return await this.prisma.material.count();
   }
-
 
   async findAll(input: FindAllMaterialInput): Promise<Paged<Material[]>> {
     const where = {
@@ -65,7 +63,7 @@ export class MaterialGateway implements MaterialPersistencePort {
     });
 
     const materials = await this.prisma.material.findMany({
-      include: this.include,
+      include: MaterialGateway.toInclude,
       skip: (input.pagination.pageNumber - 1) * input.pagination.pageSize,
       take: input.pagination.pageSize,
       where
@@ -84,7 +82,7 @@ export class MaterialGateway implements MaterialPersistencePort {
 
   async getOne(input: { id: string }): Promise<Material | null> {
     const material = await this.prisma.material.findUnique({
-      include: this.include,
+      include: MaterialGateway.toInclude,
       where: { id: input.id }
     });
 
@@ -93,7 +91,7 @@ export class MaterialGateway implements MaterialPersistencePort {
 
   async create(input: CreateMaterialInput): Promise<Material> {
     const material = await this.prisma.material.create({
-      include: this.include,
+      include: MaterialGateway.toInclude,
       data: {
         product_code: input.productCode,
         name: input.name,
@@ -112,7 +110,7 @@ export class MaterialGateway implements MaterialPersistencePort {
   }
   async update(input: UpdateMaterialInput): Promise<Material> {
     const material = await this.prisma.material.update({
-      include: this.include,
+      include: MaterialGateway.toInclude,
       where: { id: input.id },
       data: {
         product_code: input.data.productCode,

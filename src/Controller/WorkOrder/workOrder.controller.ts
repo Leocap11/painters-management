@@ -3,6 +3,8 @@ import {
   Controller,
   Delete,
   Get,
+  HttpCode,
+  HttpStatus,
   Param,
   ParseIntPipe,
   Patch,
@@ -31,9 +33,14 @@ import {
   UpdateWorkOrderRequestDTO
 } from './dto/request';
 import { WorkOrderMaterialResponseDTO } from '../WorkOrderMaterial/dto/response';
-import { CreateWorkOrderMaterialRequestDTO } from '../WorkOrderMaterial/dto/request';
+import {
+  CreateWorkOrderMaterialRequestDTO,
+  UpdateWorkOrderMaterialRequestDTO
+} from '../WorkOrderMaterial/dto/request';
 import { FromWorkOrderMaterialModelToWorkOrderMaterialResponseDTO } from '../WorkOrderMaterial/mapper/mapper';
 import { Temporal } from '@js-temporal/polyfill';
+import { DeleteWorkOrderMaterialUseCase } from 'src/Domain/WorkOrderMaterial/useCase/DeleteWorkOrderMaterialUseCase/DeleteWorkOrderMaterialUseCase';
+import { UpdateWorkOrderMaterialUseCase } from 'src/Domain/WorkOrderMaterial/useCase/UpdateWorkOrderMaterialUseCase/UpdateWorkOrderMaterialUseCase';
 
 @Controller('work-orders')
 export class WorkOrderController {
@@ -43,8 +50,10 @@ export class WorkOrderController {
     private readonly getWorkOrderUseCase: GetWorkOrderUseCase,
     private readonly findAllWorkOrderUseCase: FindAllWorkOrderUseCase,
     private readonly deleteWorkOrderUseCase: DeleteWorkOrderUseCase,
-    private readonly createWorkOrderMaterialUseCase: CreateWorkOrderMaterialUseCase
-  ) { }
+    private readonly createWorkOrderMaterialUseCase: CreateWorkOrderMaterialUseCase,
+    private readonly updateWorkOrderMaterialUseCase: UpdateWorkOrderMaterialUseCase,
+    private readonly deleteWorkOrderMaterialUseCase: DeleteWorkOrderMaterialUseCase
+  ) {}
 
   @Get()
   async getAllWorkOrders(
@@ -67,10 +76,12 @@ export class WorkOrderController {
     if (clientId) filters.clientId = clientId;
     if (isInvoiceSended) filters.isInvoiceSended = isInvoiceSended;
     if (materialIds) filters.materialIds = materialIds;
-    if (periodDateFrom) filters.periodDateFrom = Temporal.PlainDate.from(periodDateFrom);
-    if (periodDateTo) filters.periodDateTo = Temporal.PlainDate.from(periodDateTo);
+    if (periodDateFrom)
+      filters.periodDateFrom = Temporal.PlainDate.from(periodDateFrom);
+    if (periodDateTo)
+      filters.periodDateTo = Temporal.PlainDate.from(periodDateTo);
     if (workOrderStatus) filters.workOrderStatus = workOrderStatus;
-    if (currentDate) filters.currentDate = Temporal.PlainDate.from(currentDate)
+    if (currentDate) filters.currentDate = Temporal.PlainDate.from(currentDate);
     if (search) filters.search = search;
 
     const workOrders = await this.findAllWorkOrderUseCase.run({
@@ -136,6 +147,7 @@ export class WorkOrderController {
     );
   }
 
+  @HttpCode(HttpStatus.NO_CONTENT)
   @Delete(':id')
   async deleteWorkOrder(@Param('id') id: string): Promise<void> {
     await this.deleteWorkOrderUseCase.run({ id: id });
@@ -146,9 +158,9 @@ export class WorkOrderController {
   private readonly deleteWorkOrderMaterialUseCase: DeleteWorkOrderMaterialUseCase
   */
 
-  @Post(':work-order-id/material')
+  @Post(':id/add-material')
   async addMaterial(
-    @Param('work-order-id') workOrderId: string,
+    @Param('id') workOrderId: string,
     @Body() body: CreateWorkOrderMaterialRequestDTO
   ): Promise<ResponseDTO<WorkOrderMaterialResponseDTO>> {
     const workOrderMaterial = await this.createWorkOrderMaterialUseCase.run({
@@ -161,5 +173,33 @@ export class WorkOrderController {
         workOrderMaterial
       )
     );
+  }
+
+  @Patch('/:id/update-material/:materialId')
+  async updateWorkOrderMaterial(
+    @Param('id') id: string,
+    @Body()
+    body: UpdateWorkOrderMaterialRequestDTO
+  ): Promise<ResponseDTO<WorkOrderMaterialResponseDTO>> {
+    const material = await this.updateWorkOrderMaterialUseCase.run({
+      id: id,
+      data: body
+    });
+
+    return buildSuccessResponse(
+      FromWorkOrderMaterialModelToWorkOrderMaterialResponseDTO(material)
+    );
+  }
+
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @Delete('/:id/remove-material/:materialId')
+  async deleteWorkOrderMaterial(
+    @Param('id') id: string,
+    @Param('materialId') materialId: string
+  ): Promise<void> {
+    await this.deleteWorkOrderMaterialUseCase.run({
+      id: materialId,
+      workOrderId: id
+    });
   }
 }

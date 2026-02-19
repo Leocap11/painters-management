@@ -31,7 +31,6 @@ export interface FindAllWorkOrderInput {
   };
 }
 
-
 export interface CreateWorkOrderInput {
   clientId: string;
   startWorkOrderDate: Temporal.PlainDate;

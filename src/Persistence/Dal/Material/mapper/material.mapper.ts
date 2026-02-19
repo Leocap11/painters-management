@@ -1,5 +1,6 @@
 import { MaterialEntity } from 'src/Persistence/Dal/Material/entity/material.entity';
 import { Material } from '../../../../Domain/Material/model/material.model';
+import { FromSupplierEntityToSupplierModel } from '../../Supplier/mapper/supplier.mapper';
 
 export const FromMaterialEntityToMaterialModel = (
   source: MaterialEntity
@@ -11,6 +12,6 @@ export const FromMaterialEntityToMaterialModel = (
     costPerSquareMeter: source.cost_per_square_meter,
     note: source.note,
     vatPercentage: source.vat_percentage,
-    supplierId: source.supplier_id
+    Supplier: FromSupplierEntityToSupplierModel(source.Supplier)
   };
 };

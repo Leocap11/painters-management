@@ -20,4 +20,4 @@ const controllers = [
   imports: [DomainModule],
   controllers: [...controllers]
 })
-export class ControllerModule { }
+export class ControllerModule {}

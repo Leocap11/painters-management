@@ -15,84 +15,80 @@ datasource db {
 }
 
 model Client {
-  id                String      @id @default(uuid())
-  first_name        String
-  last_name         String
-  address           String      
-  city              String
-  fiscal_code       String?     @unique
-  vat_number        String?     @unique
-  mobile_phone      String?     @unique
-  telephone         String?     @unique
-  email             String?     @unique
-  WorkOrder         WorkOrder[]
+  id           String      @id @default(uuid())
+  first_name   String
+  last_name    String
+  address      String
+  city         String
+  fiscal_code  String?     @unique
+  vat_number   String?     @unique
+  mobile_phone String?     @unique
+  telephone    String?     @unique
+  email        String?     @unique
+  WorkOrder    WorkOrder[]
 }
 
 model Material {
-  id                    String      @id @default(uuid())
-  product_code          String?     
+  id                    String  @id @default(uuid())
+  product_code          String?
   name                  String
   cost_per_square_meter Float
-  note  String?
+  note                  String?
   supplier_id           String
   vat_percentage        Int
 
   //relations
-  Supplier              Supplier? @relation(references: [id], fields: [supplier_id])
-  WorkOrderMaterials  WorkOrderMaterial[]
+  Supplier           Supplier?           @relation(references: [id], fields: [supplier_id], onDelete: Cascade)
+  WorkOrderMaterials WorkOrderMaterial[]
 
-  @@unique([product_code,supplier_id,name])
+  @@unique([product_code, supplier_id, name])
 }
 
 model WorkOrder {
-  id                 String   @id @default(uuid())
-  client_id          String
-  net_work_cost      Float
-  total_vat_cost     Float
-  final_cost         Float
-  start_work_date    DateTime
-  end_work_date      DateTime
-  is_invoice_sended  Boolean   @default(false)
-  status             WorkOrderStatus  
+  id                String          @id @default(uuid())
+  client_id         String
+  net_work_cost     Float
+  total_vat_cost    Float
+  final_cost        Float
+  start_work_date   DateTime
+  end_work_date     DateTime
+  is_invoice_sended Boolean         @default(false)
+  status            WorkOrderStatus
 
   //relations
-  Client   Client     @relation(references: [id], fields: [client_id])
-  WorkOrderMaterials  WorkOrderMaterial[]
+  Client             Client              @relation(references: [id], fields: [client_id])
+  WorkOrderMaterials WorkOrderMaterial[]
 }
 
-
-model Supplier{
-  id              String @id @default(uuid())
-  name            String
-  vat_number      String @unique
-  address         String
-  city            String
-  email           String?
-  mobile_phone    String?
-  telephone       String?
+model Supplier {
+  id           String  @id @default(uuid())
+  name         String
+  vat_number   String  @unique
+  address      String
+  city         String
+  email        String?
+  mobile_phone String?
+  telephone    String?
 
   //relations
   Material Material[]
 }
 
-
 model WorkOrderMaterial {
-  id           String     @id @default(uuid())
+  id            String @id @default(uuid())
   workOrder_id  String
   material_id   String
-  square_meters Float 
-  unitPrice     Float     
+  square_meters Float
+  unitPrice     Float
 
   // relations
-  WorkOrder    WorkOrder  @relation(fields: [workOrder_id], references: [id])
-  Material     Material   @relation(fields: [material_id], references: [id])
+  WorkOrder WorkOrder @relation(fields: [workOrder_id], references: [id], onDelete: Cascade)
+  Material  Material  @relation(fields: [material_id], references: [id], onDelete: Cascade)
 
   @@unique([workOrder_id, material_id])
 }
 
-
-
-enum WorkOrderStatus{
+enum WorkOrderStatus {
   CREATED
   IN_PROGRESS
   CLOSED

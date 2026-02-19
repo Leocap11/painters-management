@@ -37,7 +37,7 @@ export class SupplierController {
     private readonly getSupplierUseCase: GetSupplierUseCase,
     private readonly findAllSupplierUseCase: FindAllSupplierUseCase,
     private readonly deleteSupplierUseCase: DeleteSupplierUseCase
-  ) { }
+  ) {}
 
   @Get()
   async getAllSuppliers(

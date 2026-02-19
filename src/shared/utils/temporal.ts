@@ -1,4 +1,4 @@
-import { Temporal } from "@js-temporal/polyfill";
+import { Temporal } from '@js-temporal/polyfill';
 
 /**
  * Convert a Prisma DateTime (@db.Date) to Temporal.PlainDate
@@ -7,10 +7,10 @@ import { Temporal } from "@js-temporal/polyfill";
  * @returns Temporal.PlainDate (YYYY-MM-DD)
  */
 export const dateToPlainDate = (date: Date): Temporal.PlainDate => {
-    const year = date.getUTCFullYear();
-    const month = date.getUTCMonth() + 1; // JavaScript months are 0-indexed
-    const day = date.getUTCDate();
-    return Temporal.PlainDate.from({ year, month, day });
+  const year = date.getUTCFullYear();
+  const month = date.getUTCMonth() + 1; // JavaScript months are 0-indexed
+  const day = date.getUTCDate();
+  return Temporal.PlainDate.from({ year, month, day });
 };
 
 /**
@@ -21,11 +21,11 @@ export const dateToPlainDate = (date: Date): Temporal.PlainDate => {
  * @returns Temporal.ZonedDateTime
  */
 export const dateToZonedDateTime = (
-    date: Date,
-    timeZone: string = 'Europe/Rome'
+  date: Date,
+  timeZone: string = 'Europe/Rome'
 ): Temporal.ZonedDateTime => {
-    const instant = Temporal.Instant.fromEpochMilliseconds(date.getTime());
-    return instant.toZonedDateTimeISO(timeZone);
+  const instant = Temporal.Instant.fromEpochMilliseconds(date.getTime());
+  return instant.toZonedDateTimeISO(timeZone);
 };
 
 /**
@@ -34,7 +34,7 @@ export const dateToZonedDateTime = (
  * @returns JavaScript Date object (set to UTC midnight)
  */
 export const plainDateToDate = (plainDate: Temporal.PlainDate): Date => {
-    return new Date(`${plainDate.toString()}T00:00:00.000Z`);
+  return new Date(`${plainDate.toString()}T00:00:00.000Z`);
 };
 
 /**
@@ -43,7 +43,7 @@ export const plainDateToDate = (plainDate: Temporal.PlainDate): Date => {
  * @returns JavaScript Date object
  */
 export const zonedDateTimeToDate = (
-    zonedDateTime: Temporal.ZonedDateTime
+  zonedDateTime: Temporal.ZonedDateTime
 ): Date => {
-    return new Date(zonedDateTime.epochMilliseconds);
+  return new Date(zonedDateTime.epochMilliseconds);
 };

@@ -1,3 +1,4 @@
+import { FromClientEntityToClientModel } from './../../Client/mapper/client.mapper';
 import {
   WorkOrder,
   WorkOrderStatusModel
@@ -22,7 +23,7 @@ export const FromWorkOrderEntityToWorkOrderModel = (
     status: FormWorkOrderStatusPrismaToWorkOrderStatus(source.status),
 
     //relations
-    clientId: source.client_id,
+    Client: FromClientEntityToClientModel(source.Client),
     WorkOrderMaterials: source.WorkOrderMaterials.map(
       FromWorkOrderMaterialEntityToWorkOrderMaterialModel
     )

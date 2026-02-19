@@ -1,3 +1,4 @@
+import { ClientResponseDTO } from 'src/Controller/Client/dto/response';
 import { WorkOrderMaterialResponseDTO } from 'src/Controller/WorkOrderMaterial/dto/response';
 import { WorkOrderStatusModel } from 'src/Domain/WorkOrder/model/workOrder.model';
 
@@ -10,7 +11,7 @@ export interface WorkOrderResponseDTO {
   endWorkOrderDate: string;
   isInvoiceSended: boolean;
   status: WorkOrderStatusModel;
-  clientId: string;
+  Client: ClientResponseDTO;
 
   //relations
   WorkOrderMaterials: WorkOrderMaterialResponseDTO[];

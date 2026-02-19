@@ -8,18 +8,23 @@ import {
 import { WorkOrderMaterial } from 'src/Domain/WorkOrderMaterial/model/workOrderMaterial.model';
 import { FromWorkOrderMaterialEntityToWorkOrderMaterialModel } from './mapper/workOrderMaterial.mapper';
 import { PaintersManagementService } from 'src/Persistence/Clients/Prisma/PrismaPaintersManagementClient';
+import { MaterialGateway } from '../Material/material.gateway';
 
 @Injectable()
 export class WorkOrderMaterialGateway
-  implements WorkOrderMaterialPersistencePort {
-  constructor(private readonly prisma: PaintersManagementService) { }
-  private readonly include = { Material: true, WorkOrder: true } satisfies PrismaPaintersEntities.Prisma.WorkOrderMaterialInclude;
+  implements WorkOrderMaterialPersistencePort
+{
+  constructor(private readonly prisma: PaintersManagementService) {}
+  public static readonly toInclude = {
+    Material: { include: MaterialGateway.toInclude },
+    WorkOrder: true
+  } satisfies PrismaPaintersEntities.Prisma.WorkOrderMaterialInclude;
 
   async create(
     input: CreateWorkOrderMaterialInput
   ): Promise<WorkOrderMaterial> {
     const workOrderMaterial = await this.prisma.workOrderMaterial.create({
-      include: this.include,
+      include: WorkOrderMaterialGateway.toInclude,
       data: {
         unitPrice: input.unitPrice,
         material_id: input.materialId,
@@ -37,7 +42,7 @@ export class WorkOrderMaterialGateway
     input: UpdateWorkOrderMaterialInput
   ): Promise<WorkOrderMaterial> {
     const workOrderMaterial = await this.prisma.workOrderMaterial.update({
-      include: this.include,
+      include: WorkOrderMaterialGateway.toInclude,
       where: { id: input.id },
       data: {
         unitPrice: input.data.unitPrice,

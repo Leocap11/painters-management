@@ -1,3 +1,4 @@
+import { FromClientModelToClientResponseDTO } from './../../Client/mapper/mapper';
 import { WorkOrder } from 'src/Domain/WorkOrder/model/workOrder.model';
 import { WorkOrderResponseDTO } from '../dto/response';
 import { FromWorkOrderMaterialModelToWorkOrderMaterialResponseDTO } from 'src/Controller/WorkOrderMaterial/mapper/mapper';
@@ -16,7 +17,7 @@ export const FromWorkOrderModelToWorkOrderResponseDTO = (
     status: source.status,
 
     //Relations
-    clientId: source.clientId,
+    Client: FromClientModelToClientResponseDTO(source.Client),
     WorkOrderMaterials: source.WorkOrderMaterials.map((wm) =>
       FromWorkOrderMaterialModelToWorkOrderMaterialResponseDTO(wm)
     )

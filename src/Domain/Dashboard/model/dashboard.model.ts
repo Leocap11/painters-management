@@ -1,6 +1,6 @@
 export interface DashboardCountsModel {
-    materials: number;
-    workOrders: number;
-    clients: number;
-    suppliers: number;
+  materials: number;
+  workOrders: number;
+  clients: number;
+  suppliers: number;
 }

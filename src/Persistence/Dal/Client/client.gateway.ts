@@ -13,14 +13,14 @@ import { PaintersManagementService } from 'src/Persistence/Clients/Prisma/Prisma
 
 @Injectable()
 export class ClientGateway implements ClientPersistencePort {
-  constructor(private readonly prisma: PaintersManagementService) { }
+  constructor(private readonly prisma: PaintersManagementService) {}
 
   private readonly include = {
     WorkOrder: true
   } satisfies PrismaPaintersEntities.Prisma.ClientInclude;
 
   async getCount(): Promise<number> {
-    return await this.prisma.client.count()
+    return await this.prisma.client.count();
   }
 
   async getOne(input: { id: string }): Promise<Client | null> {

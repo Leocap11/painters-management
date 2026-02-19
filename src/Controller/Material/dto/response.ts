@@ -1,3 +1,5 @@
+import { SupplierResponseDTO } from 'src/Controller/Supplier/dto/response';
+
 export interface MaterialResponseDTO {
   id: string;
   productCode: string | null;
@@ -6,5 +8,5 @@ export interface MaterialResponseDTO {
   note: string | null;
   vatPercentage: number;
 
-  supplierId: string;
+  Supplier: SupplierResponseDTO;
 }

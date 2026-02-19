@@ -15,28 +15,26 @@ import {
 import { Paged } from 'src/shared/utils/utils';
 import { PaintersManagementService } from 'src/Persistence/Clients/Prisma/PrismaPaintersManagementClient';
 import { plainDateToDate } from 'src/shared/utils/temporal';
+import { WorkOrderMaterialGateway } from '../WorkOrderMaterial/workOrderMaterial.gateway';
 
 @Injectable()
 export class WorkOrderGateway implements WorkOrderPersistencePort {
-  constructor(private readonly prisma: PaintersManagementService) { }
+  constructor(private readonly prisma: PaintersManagementService) {}
 
-  private include = {
+  public static readonly toInclude = {
     Client: true,
     WorkOrderMaterials: {
-      include: {
-        Material: true
-      }
+      include: WorkOrderMaterialGateway.toInclude
     }
   } satisfies PrismaPaintersEntities.Prisma.WorkOrderInclude;
 
-
   async getCount(): Promise<number> {
-    return await this.prisma.workOrder.count()
+    return await this.prisma.workOrder.count();
   }
 
   async create(input: CreateWorkOrderInput): Promise<WorkOrder> {
     const workOrder = await this.prisma.workOrder.create({
-      include: this.include,
+      include: WorkOrderGateway.toInclude,
       data: {
         start_work_date: plainDateToDate(input.startWorkOrderDate),
         end_work_date: plainDateToDate(input.endWorkOrderDate),
@@ -89,12 +87,16 @@ export class WorkOrderGateway implements WorkOrderPersistencePort {
         },
         {
           ...(input.filters.periodDateFrom && {
-            end_work_date: { gte: plainDateToDate(input.filters.periodDateFrom) }
+            end_work_date: {
+              gte: plainDateToDate(input.filters.periodDateFrom)
+            }
           })
         },
         {
           ...(input.filters.periodDateTo && {
-            start_work_date: { lte: plainDateToDate(input.filters.periodDateTo) }
+            start_work_date: {
+              lte: plainDateToDate(input.filters.periodDateTo)
+            }
           })
         },
         {
@@ -111,19 +113,20 @@ export class WorkOrderGateway implements WorkOrderPersistencePort {
         },
         {
           ...(input.filters.currentDate && {
-            ...((): { end_work_date: { gte: Date, lte: Date } } => {
+            ...(): { end_work_date: { gte: Date; lte: Date } } => {
               const startOfDay = input.filters.currentDate;
-              const endOfDay = new Date(`${startOfDay.add({ days: 7 }).toString()}T23:59:59.999Z`);
+              const endOfDay = new Date(
+                `${startOfDay.add({ days: 7 }).toString()}T23:59:59.999Z`
+              );
               return {
                 end_work_date: {
                   gte: plainDateToDate(startOfDay),
                   lte: endOfDay
                 }
-              }
-            })
-
+              };
+            }
           })
-        },
+        }
       ],
       ...(input.filters.search && {
         OR: [
@@ -164,7 +167,7 @@ export class WorkOrderGateway implements WorkOrderPersistencePort {
     });
 
     const workOrders = await this.prisma.workOrder.findMany({
-      include: this.include,
+      include: WorkOrderGateway.toInclude,
       skip: (input.pagination.pageNumber - 1) * input.pagination.pageSize,
       take: input.pagination.pageSize,
       where
@@ -183,7 +186,7 @@ export class WorkOrderGateway implements WorkOrderPersistencePort {
 
   async getOne(input: { id: string }): Promise<WorkOrder | null> {
     const workOrder = await this.prisma.workOrder.findUnique({
-      include: this.include,
+      include: WorkOrderGateway.toInclude,
       where: { id: input.id }
     });
     return workOrder ? FromWorkOrderEntityToWorkOrderModel(workOrder) : null;
@@ -191,7 +194,7 @@ export class WorkOrderGateway implements WorkOrderPersistencePort {
 
   async update(input: UpdateWorkOrderInput): Promise<WorkOrder> {
     const workOrder = await this.prisma.workOrder.update({
-      include: this.include,
+      include: WorkOrderGateway.toInclude,
       where: { id: input.id },
       data: {
         status: FormWorkOrderStatusToWorkOrderStatusPrisma(input.data.status),

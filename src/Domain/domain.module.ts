@@ -76,4 +76,4 @@ const providers = [
   providers: [...providers],
   exports: [...providers]
 })
-export class DomainModule { }
+export class DomainModule {}

@@ -13,12 +13,12 @@ import { PaintersManagementService } from 'src/Persistence/Clients/Prisma/Prisma
 
 @Injectable()
 export class SupplierGateway implements SupplierPersistenceGateway {
-  constructor(private readonly prisma: PaintersManagementService) { }
+  constructor(private readonly prisma: PaintersManagementService) {}
 
   private readonly include = { Material: true };
 
   async getCount(): Promise<number> {
-    return await this.prisma.supplier.count()
+    return await this.prisma.supplier.count();
   }
 
   async getOne(input: { id: string }): Promise<Supplier | null> {

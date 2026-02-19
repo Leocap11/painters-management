@@ -1,3 +1,5 @@
+import { Supplier } from 'src/Domain/Supplier/model/supplier.model';
+
 export interface Material {
   id: string;
   productCode?: string;
@@ -5,5 +7,5 @@ export interface Material {
   costPerSquareMeter: number;
   note?: string;
   vatPercentage: number;
-  supplierId: string;
+  Supplier: Supplier;
 }
